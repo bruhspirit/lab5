@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h1>
+        Грамматика
+    </h1>
+    <p>
+        Определим грамматику для объявления списка с инициализацией на языке Python G[‹Def›] в нотации Хомского с продукциями P:
+    </p>
+    <p>1. DEF->letter LISTNAME</p>
+    <p>2. LISTNAME->letter LISTNAME | = ASSIGNTMENT</p>
+    <p>3. ASSIGNTMENT-> [ITEMS</p>
+    <p>4. ITEMS-> [+| -] NUMBER | " STRING</p>
+    <p>5. NUMBER->digit NUMBERREM</p>
+    <p>6. NUMBERREM-> , ITEMS | ] | digit NUMBERREM | .DECIMAL </p>
+    <p>7. DECIMAL->digit DECIMALREM</p>
+    <p>8. DECIMALREM-> , ITEMS | ] | digit DECIMALREM</p>
+    <p>9. STRING-> "] | ", ITEMS | symbol STRING</p>
+  
+    <p>
+        - letter → “a” | “b” | “c” | ... | “z” | “A” | “B” | “C” | ... | “Z”<br />
+        - digit → “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9”<br />
+        - symbol -> Любой символ из таблицы ASCII кроме двойных и одинарных ковычек<br />
+        Следуя введенному формальному определению грамматики, представим G[‹Def›] ее составляющими:<br />
+        - Z = ‹Def›;<br />
+        - V<sub>T</sub> = {a, b, c, ..., z, A, B, C, ..., Z, _, \n, \t, 1, 2, 3, 4, 5, 6, 7, 8, 9};<br />
+        - V<sub>N</sub> = {‹DEF›, ‹LISTNAME›, ‹ITEMS›, ‹NUMBER›, ‹NUMBERREM› , ‹DECIMAL›, ‹DECIMALREM› , ‹STRING› , ‹EQUAL›, ‹END›}.
+    </p>
+</body>
+</html>

@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h1>
+        Классификация грамматики
+    </h1>
+    <p>
+        Согласно классификации Хомского, грамматика G[‹Def›] является автоматной. 
+        Правила (1)-(15) относятся к классу праворекурсивных продукций (A → aB | a | ε):
+    </p>
+    <p>1. DEF->letter LISTNAME</p>
+    <p>2. LISTNAME->letter LISTNAME | = ASSIGNTMENT</p>
+    <p>3. ASSIGNTMENT-> [ITEMS</p>
+    <p>4. ITEMS-> [+| -] NUMBER | " STRING</p>
+    <p>5. NUMBER->digit NUMBERREM</p>
+    <p>6. NUMBERREM-> , ITEMS | ] | digit NUMBERREM | .DECIMAL </p>
+    <p>7. DECIMAL->digit DECIMALREM</p>
+    <p>8. DECIMALREM-> , ITEMS | ] | digit DECIMALREM</p>
+    <p>9. STRING-> "] | ", ITEMS | symbol STRING</p>
+</body>
+</html>
