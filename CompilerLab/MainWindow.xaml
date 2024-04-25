@@ -71,6 +71,11 @@
                     <MenuItem Header="Русский" Click="SwitchToRussian"></MenuItem>
                     <MenuItem Header="English" Click="SwitchToEnglish"></MenuItem>
                 </MenuItem>
+                <MenuItem Header="Вариант" Name="Variant">
+                    <MenuItem Header="Целые числа, с плавающей точкой" Click="nums"></MenuItem>
+                    <MenuItem Header="Visa" Click="visa"></MenuItem>
+                    <MenuItem Header="Широта" Click="latitude"></MenuItem>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="Пуск" Name="RunOption" IsEnabled="False" Click="Run"></MenuItem>
         </Menu>
