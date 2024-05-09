@@ -13,6 +13,7 @@ using System.Net;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -710,11 +711,11 @@ namespace CompilerLab
             return result;
         }
 
-      
+
 
         private Dictionary<string, Dictionary<string, string>> transitions = new Dictionary<string, Dictionary<string, string>>();
 
-     
+
 
         /*1) DEF->letter LISTNAME
         2) LISTNAME->letter LISTNAME | = ASSIGNTMENT
@@ -859,7 +860,7 @@ namespace CompilerLab
         // a + b - c * d = x
         List<string> tokens = new List<string>();
         List<string> operators = new List<string>();
-        
+
         Dictionary<string, string> results = new Dictionary<string, string>();
         private void FillTokens()
         {
@@ -893,253 +894,178 @@ namespace CompilerLab
             public string res = "";
         }
         public int count = 1;
-       
-        
+
+        private void Task21(string str, int n)
+        {
+            string pattern = @"\d*(\,?\d*)";
+
+            Regex regex = new Regex(pattern);
+            MatchCollection matches = regex.Matches(str);
+            if (matches.Count > 0)
+            {
+                foreach (Match match in matches)
+                {
+                    if (match.Value != "" && (match.Value != " " && (match.Value != "\r")))
+                    {
+                        string res = match.Value;
+                        if (res.Last() == ',')
+                            res += "0";
+                        Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = "" + res, Symbol = "" + match.Index, String = Convert.ToString(n + 1) });
+                    }
+
+                }
+            }
+        }
+        private void Task5(string str, int n)
+        {
+            string pattern = @"4\d{3}-\d{4}-\d{4}-\d{4}";
+            Regex regex = new Regex(pattern);
+            MatchCollection matches = regex.Matches(str);
+            if (matches.Count > 0)
+            {
+                foreach (Match match in matches)
+                {
+                    if (match.Value != "" && (match.Value != " " && (match.Value != "\r")))
+                    {
+                        string res = match.Value;
+                        Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = "" + res, Symbol = "" + match.Index, String = Convert.ToString(n + 1) });
+                    }
+
+                }
+            }
+        }
+        private void Task17(string str, int n)
+        {
+            string pattern = @"[-+]?([0-9]|[1-8][0-9]|90)\.?(?<=\.)\d*?[NS]";
+            Regex regex = new Regex(pattern);
+            MatchCollection matches = regex.Matches(str);
+            if (matches.Count > 0)
+            {
+                foreach (Match match in matches)
+                {
+                    if (match.Value != "" && (match.Value != " " && (match.Value != "\r")))
+                    {
+                        string res = match.Value;
+                        if (res.Last() == '.')
+                            res += "0";
+                        Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = "" + res, Symbol = "" + match.Index, String = Convert.ToString(n + 1) });
+                    }
+
+                }
+            }
+        }
+        private int ct = 21;
+
+        private void Sign(string str, int n)
+        {
+            result += "S ";
+        }
+
+        private int Number(string str, int n)
+        {
+            result += "N ";
+            if (n + 1 < str.Length)
+            {
+                if (Char.IsDigit(str[n + 1]))
+                {
+                    
+                    n = Number(str, n + 1);
+                    Digit(str, n + 1);
+                    //return n;
+                }
+            }
+            Digit(str, n);
+            return n;
+
+        }
+
+        private void SubFormula(string str, int n)
+        {
+            result += "F ";
+        }
+
+        private void Digit(string str, int n)
+        {
+            result += "D ";
+        }
+
+
+        private void Formula(string str, int n)
+        {
+            result += "F -> ";
+            if (n < str.Length)
+            {
+                for (int i = 0; i < str.Length; i++)
+                {
+                    if (Char.IsDigit(str[i]))
+                    {
+                        SubFormula(str, i);
+                        i = Number(str, i);
+                        continue;
+                    }
+                    else if (str[i] == '+' || str[i] == '-' || str[i] == '*' || str[i] == '/')
+                    {
+                        Sign(str, i);
+                        continue;
+                    }
+                    else if (str[i] == '(' || str[i] == ')')
+                    {
+                        if (str[i] == '(' && !str.Contains(')'))
+                        {
+                            Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = "Отсутствует закрывающая скобка", Symbol = "" + i, String = "" + n });
+                            break;
+                        }
+                        if (str[i] == ')' && !str.Contains('('))
+                        {
+                            Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = "Отсутствует открывающая скобка", Symbol = "" + i, String = "" + n });
+                            break;
+                        }
+
+                        continue;
+                    }
+                    else
+                    {
+                        if (str[i] != '\r' && str[i] != ' ')
+                        {
+                            Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = "Неожиданный символ", Symbol = "" + i, String = "" + n });
+                            break;
+                        }
+                                      
+                    }
+                }
+            }
+        }
+        string result = "";
         private void Parser(string str, int n)
         {
-            int pos = 0;
-            string lex = "";
-            List<string> e = new List<string>();
-            List<Result> res = new List<Result>();
-            while (true)
-            {
-                if (pos >= str.Length)
-                {
-                    if (lex != "")
-                    {
-                        e.Add(lex);
-                        lex = "";
-                    }
-                    break;
-                }
-                if (tokens.Contains(str[pos] + ""))
-                {
-                    lex += str[pos];
-                }
-                else if (operators.Contains(str[pos] + ""))
-                {
-                    if (lex != "")
-                    {
-                        e.Add(lex);
-                        lex = "";
-                    }
-                    e.Add(str[pos] + "");
-                }
-                else
-                {
-                    if (str[pos] != '\r')
-                    {
-                        Output.Items.Add(new OutputItem { Code = "19", Type = "Ошибка: недопустимый символ", Lexem = str[pos] + "", Symbol = "" + pos, String = "" + (n + 1) });
-                    }
-                   
-                }
-                pos++;
-            }
-            if (e.Count > 0)
-            {
-                if (operators.Contains(e[0]) && tokens.Contains(e[1][0] + "") && (e[0] == "-" || e[0] == "+"))
-                {
-                    string replaceValue = "t" + Convert.ToString(count);
-                    string op = e[0];
-                    string a2 = e[1];
-                    int startRange = 0;
-                    int counts = 2;
-                    e.RemoveRange(startRange, counts);
-                    e.Insert(startRange, replaceValue);
-                    string r = "";
-                    for (int z = 0; z < e.Count; z++)
-                    {
-                        r += e[z];
-                    }
-                    Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = r, Symbol = e[startRange] + ": " + op + a2, String = "" + (n + 1) });
-                    str = r;
-                    count++;
-                }
-            }
             
-            for (int i = 0; i < e.Count - 2; i++)
-            {
-                if (operators.Contains(e[i]) && operators.Contains(e[i + 1]) && tokens.Contains(e[i + 2][0] + "") && (e[i+1] == "-" || e[i + 1] == "+"))
-                {
-                    string replaceValue = "t" + Convert.ToString(count);
-                    string op = e[i + 1];
-                    string a2 = e[i + 2];
-                    int startRange = Math.Max(0, i+1);
-                    int counts = Math.Min(2, e.Count - startRange);
-                    e.RemoveRange(startRange, counts);
-                    e.Insert(startRange, replaceValue);
-                    string r = "";
-                    for (int z = 0; z < e.Count; z++)
-                    {
-                        r += e[z];
-                    }
-                    Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = r, Symbol = e[startRange] + ": "  + op + a2, String = "" + (n + 1) });
-                    str = r;
-                    count++;
-                    continue;
-                }
-            }
-            while (e.Contains("*"))
-            {
-                int index = e.IndexOf("*");
-                string replaceValue = "t" + Convert.ToString(count);
-                
-                int startRange = Math.Max(0, index - 1);
-                string a1 = e[startRange];
-                string op = e[startRange + 1]; 
-                string a2 = e[startRange + 2];
-                int counts = Math.Min(3, e.Count - startRange);
-                e.RemoveRange(startRange, counts);
-                e.Insert(startRange, replaceValue);
-                string r = "";
-                for (int i = 0; i < e.Count; i++)
-                {
-                    r += e[i];
-                }
-                Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = r, Symbol = e[startRange] + ": " + a1 + op + a2, String = "" + (n + 1) });
-                str = r;
-                count++;
-                continue;
-            }
-            while (e.Contains("/"))
-            {
-                int index = e.IndexOf("/");
-                string replaceValue = "t" + Convert.ToString(count);
+            Formula(str, n);
+            Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = result, Symbol = "", String = "" });
+        }
 
-                int startRange = Math.Max(0, index - 1);
-                string a1 = e[startRange];
-                string op = e[startRange + 1];
-                string a2 = e[startRange + 2];
-                int counts = Math.Min(3, e.Count - startRange);
-                e.RemoveRange(startRange, counts);
-                e.Insert(startRange, replaceValue);
-                string r = "";
-                for (int i = 0; i < e.Count; i++)
-                {
-                    r += e[i];
-                }
-                Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = r, Symbol = e[startRange] + ": " + a1 + op + a2, String = "" + (n + 1) });
-                str = r;
-                count++;
-                continue;
-            }
-
-            int pos2 = 0;
-            lex = "";
-            List<string> e2 = new List<string>();
-            List<Result> res2 = new List<Result>();
-            while (true)
-            {
-                if (pos2 >= str.Length)
-                {
-                    if (lex != "")
-                    {
-                        e2.Add(lex);
-                        lex = "";
-                    }
-                    break;
-                }
-                if (tokens.Contains(str[pos2] + ""))
-                {
-                    lex += str[pos2];
-                }
-                else if (operators.Contains(str[pos2] + ""))
-                {
-                    if (lex != "")
-                    {
-                        e2.Add(lex);
-                        lex = "";
-                    }
-                    e2.Add(str[pos2] + "");
-                }
-                else
-                {
-                    if (str[pos2] != '\r')
-                    {
-                        Output.Items.Add(new OutputItem { Code = "19", Type = "Ошибка: недопустимый символ", Lexem = str[pos] + "", Symbol = "" + pos2, String = "" + (n + 1) });
-                    }
-
-                }
-                pos2++;
-            }
-            while (e2.Contains("+"))
-            {
-                int index = e2.IndexOf("+");
-                string replaceValue = "t" + Convert.ToString(count);
-
-                int startRange = Math.Max(0, index - 1);
-                string a1 = e2[startRange];
-                string op = e2[startRange + 1];
-                string a2 = e2[startRange + 2];
-                int counts = Math.Min(3, e2.Count - startRange);
-                e2.RemoveRange(startRange, counts);
-                e2.Insert(startRange, replaceValue);
-                string r = "";
-                for (int i = 0; i < e2.Count; i++)
-                {
-                    r += e2[i];
-                }
-                Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = r, Symbol = e2[startRange] + ": " + a1 + op + a2, String = "" + (n + 1) });
-                str = r;
-                count++;
-                continue;
-            }
-            while (e2.Contains("-"))
-            {
-                int index = e2.IndexOf("-");
-                string replaceValue = "t" + Convert.ToString(count);
-
-                int startRange = Math.Max(0, index - 1);
-                string a1 = e2[startRange];
-                string op = e2[startRange + 1];
-                string a2 = e2[startRange + 2];
-                int counts = Math.Min(3, e2.Count - startRange);
-                e2.RemoveRange(startRange, counts);
-                e2.Insert(startRange, replaceValue);
-                string r = "";
-                for (int i = 0; i < e2.Count; i++)
-                {
-                    r += e2[i];
-                }
-                Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = r, Symbol = e2[startRange] + ": " + a1 + op + a2, String = "" + (n + 1) });
-                str = r;
-                count++;
-                continue;
-            }
-            while (e2.Contains("="))
-            {
-                int index = e2.IndexOf("=");
-                string replaceValue = "t" + Convert.ToString(count);
-
-                int startRange = Math.Max(0, index - 1);
-                string a1 = e2[startRange];
-                string op = e2[startRange + 1];
-                string a2 = e2[startRange + 2];
-                int counts = Math.Min(3, e2.Count - startRange);
-                e2.RemoveRange(startRange, counts);
-                e2.Insert(startRange, replaceValue);
-                string r = "";
-                for (int i = 0; i < e2.Count; i++)
-                {
-                    r += e2[i];
-                }
-                Output.Items.Add(new OutputItem { Code = "", Type = "", Lexem = r, Symbol = e2[startRange] + ": " + a1 + op + a2, String = "" + (n + 1) });
-                str = r;
-                count++;
-                continue;
-            }
+        private void nums(object sender, EventArgs e)
+        {
+            ct = 21;
+        }
+        private void latitude(object sender, EventArgs e)
+        {
+            ct = 17;
+        }
+        private void visa(object sender, EventArgs e)
+        {
+            ct = 5;
         }
         private void Run(object sender, EventArgs e)
         {
             Output.Items.Clear();
+            result = "";
             count = 1;
             string[] allStrings = Input.Text.Split('\n');
             FillTokens();
-            Result result = new Result();
-            for (int i = 0; i < allStrings.Count(); i++ )
+            for (int i = 0; i < allStrings.Count(); i++)
             {
-                Parser(allStrings[i], i);
-                
+                if (allStrings[i] != "\r" && allStrings[i] != " " && allStrings[i] != "")
+                    Parser(allStrings[i], i);
             }
         }
 
